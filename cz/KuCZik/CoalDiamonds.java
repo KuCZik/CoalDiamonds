@@ -77,6 +77,22 @@ public class CoalDiamonds extends JavaPlugin {
         saveConfig();
     }
 
+    // Enabling plugin
+    @Override
+    public void onEnable(){
+        loadConfig();
+        getServer().getPluginManager().registerEvents(new onBlockBreakListener(), this);
+        getLogger().info("CoalDiamonds " + getDescription().getVersion() + " " + onEnable);
+        saveConfig();
+    }
+    
+    // Disabling plugin
+    @Override
+    public void onDisable() {
+        getLogger().info("CoalDiamonds " + getDescription().getVersion() + " " + onDisable);
+        saveConfig();
+    }
+    
     // Getting strings from config.yml that are used in plugin
     public String noPerms = getConfig().getString("message.noPerms");
     public String configReload = getConfig().getString("message.configReload");
@@ -114,7 +130,6 @@ public class CoalDiamonds extends JavaPlugin {
     public String onDisable = getConfig().getString("message.onDisable");
     
     // Declaration of variables
-    public CommandSender sender;
     public Block brokenByPlayer;
     public Player playerWhoBrokeBlock;
     public int item;
@@ -134,29 +149,13 @@ public class CoalDiamonds extends JavaPlugin {
     public boolean usePerms = getConfig().getBoolean("permissions.usePerms");
     public int xpDrop = getConfig().getInt("chance.xpDrop");
     public boolean launchFireworkConfig = getConfig().getBoolean("misc.launchFirework");
-
-    // Enabling plugin
-    @Override
-    public void onEnable(){
-        loadConfig();
-        getServer().getPluginManager().registerEvents(new onBlockBreakListener(), this);
-        getLogger().info("CoalDiamonds " + getDescription().getVersion() + " " + onEnable);
-        saveConfig();
-    }
-    
-    // Disabling plugin
-    @Override
-    public void onDisable() {
-        getLogger().info("CoalDiamonds " + getDescription().getVersion() + " " + onDisable);
-        saveConfig();
-    }
     
     // Commands
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
         if (cmd.getName().equalsIgnoreCase("cdia")){
             if (args.length > 0){
-                switch(args[1].toLowerCase()){
+                switch(args[0].toLowerCase()){
                     
                     // Reload command
                     case "reload":
@@ -183,6 +182,7 @@ public class CoalDiamonds extends JavaPlugin {
                             }
                             else {
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
+                                return true;
                             }
                         }
                         else {
@@ -203,6 +203,7 @@ public class CoalDiamonds extends JavaPlugin {
                             }
                             else {
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
+                                return true;
                             }
                         }
                         else {
@@ -230,10 +231,12 @@ public class CoalDiamonds extends JavaPlugin {
                                 }
                                 else {
                                     sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
+                                    return true;
                                 }
                             }
                             catch (NumberFormatException e){
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + numberError);
+                                return true;
                             }
                         }
                         else {
@@ -261,10 +264,12 @@ public class CoalDiamonds extends JavaPlugin {
                                 }
                                 else {
                                     sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
+                                    return true;
                                 }
                             }
                             catch (NumberFormatException e){
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + numberError);
+                                return true;
                             }
                         }
                         else {
@@ -371,10 +376,12 @@ public class CoalDiamonds extends JavaPlugin {
                                 }
                                 else {
                                     sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
+                                    return true;
                                 }
                             }
                             catch (NumberFormatException e){
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + numberError);
+                                return true;
                             }
                         }
                         else {
@@ -384,14 +391,14 @@ public class CoalDiamonds extends JavaPlugin {
                     
                     // Help if argument is bad
                     default:
-                        help();
+                        help(sender);
                         return true;
                 }
             }
             
             // Help if no argument is given
             else if (args.length==0){
-                help();
+                help(sender);
                 return true;
             }
         }
@@ -399,7 +406,7 @@ public class CoalDiamonds extends JavaPlugin {
     }
     
     // Help method
-    public void help(){
+    public void help(CommandSender sender){
         sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.WHITE + help + ":");
         if (sender.hasPermission("CoalDiamonds.cmd.reload")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "reload" + ChatColor.WHITE + " - " + helpReload);
@@ -458,8 +465,41 @@ public class CoalDiamonds extends JavaPlugin {
             return c;
         }
         
+        // BlockBreak event
+        @EventHandler
+        public void onBlockBreak(BlockBreakEvent event) {
+            brokenByPlayer = event.getBlock();
+            playerWhoBrokeBlock = event.getPlayer();
+            id = brokenByPlayer.getTypeId();
+            enchant = event.getPlayer().getItemInHand().getEnchantments().toString();
+            if(enchant.contains("FORTUNE")){
+                switch(item){
+                    case 270: configChanceWood = configChanceWood + fortune; break;
+                    case 274: configChanceStone = configChanceStone + fortune; break;
+                    case 257: configChanceIron = configChanceIron + fortune; break;
+                    case 285: configChanceGold = configChanceGold + fortune; break;
+                    case 278: configChanceDia = configChanceDia + fortune; break;
+                    default: break;
+                }
+            }
+            if (id==16){
+                if (usePerms==true){
+                    if (playerWhoBrokeBlock.hasPermission("CoalDiamonds.canMine")){
+                        coalBreak(event);
+                    }
+                }
+                else if (usePerms==false){
+                    coalBreak(event);
+                }
+            }
+        }
+        
         // What to do, when coal ore is mined
-        public void coalBreak(){
+        public void coalBreak(BlockBreakEvent event){
+            playerWhoBrokeBlock = event.getPlayer();
+            gm = event.getPlayer().getGameMode().name();
+            item = event.getPlayer().getItemInHand().getTypeId();
+            enchant = event.getPlayer().getItemInHand().getEnchantments().toString();
             if (!gm.equals("CREATIVE") && !enchant.contains("SILK_TOUCH") && event.isCancelled()==false){
                 switch(item){
                     case 270: if (new Random().nextInt(percentage) < configChanceWood){drop();} break;
@@ -496,37 +536,6 @@ public class CoalDiamonds extends JavaPlugin {
                 fw.setFireworkMeta(fwm);
             }
             playerWhoBrokeBlock.sendMessage(ChatColor.AQUA + luckyDrop);
-        }
-        
-        // BlockBreak event
-        @EventHandler
-        public void onBlockBreak(BlockBreakEvent event) {
-            brokenByPlayer = event.getBlock();
-            playerWhoBrokeBlock = event.getPlayer();
-            item = event.getPlayer().getItemInHand().getTypeId();
-            id = brokenByPlayer.getTypeId();
-            gm = event.getPlayer().getGameMode().name();
-            enchant = event.getPlayer().getItemInHand().getEnchantments().toString();
-            if(enchant.contains("FORTUNE")){
-                switch(item){
-                    case 270: configChanceWood = configChanceWood + fortune; break;
-                    case 274: configChanceStone = configChanceStone + fortune; break;
-                    case 257: configChanceIron = configChanceIron + fortune; break;
-                    case 285: configChanceGold = configChanceGold + fortune; break;
-                    case 278: configChanceDia = configChanceDia + fortune; break;
-                    default: break;
-                }
-            }
-            if (id==16){
-                if (usePerms==true){
-                    if (playerWhoBrokeBlock.hasPermission("CoalDiamonds.canMine")){
-                        coalBreak();
-                    }
-                }
-                else if (usePerms==false){
-                    coalBreak();
-                }
-            }
         }
     }
 }
