@@ -1,4 +1,4 @@
-<h1>CoalDiamonds</h1>
+<h1>CoalDiamonds - OBSOLETE</h1>
 Mine coal with chance to drop diamonds!!!
 <h2>Introduction</h2>
 This plugin give you a changeable chance to drop diamond from coal ore when you mine it.
@@ -61,9 +61,9 @@ Just put CoalDiamonds.jar in plugins folder. Config.yml will be created automati
 <h2>Chance System</h2>
 If you have percentage on default value (100) and for example diamond pickaxe chance on 3, you will have 3% chance to drop diamond from coal ore. If you have percentage value on 200 and diamond pickaxe chance on 3, you will have 1,5% chance. If you have percentage on default value (100) and diamond pickaxe 50, you will have 50% chance to drop. But if you have percentage on 200 and diamond pickaxe on 50, you will have only 25% chance.
 <h2>Bukkit Dev</h2>
-If you want this plugin, you can find it <a href="http://dev.bukkit.org/server-mods/coaldiamonds/">HERE</a>
+If you want this plugin, you can find it <a href="https://dev.bukkit.org/projects/coaldiamonds">HERE</a>
 <h2>Feedback</h2>
-If you have something on your mind, what I can change or add, please send me an E-Mail to: kijuca.96@gmail.com
+If you have something on your mind, what I can change or add, please send me an E-Mail to: admin@kuczik.cz
 
 If you find a bug, create new issue
 
