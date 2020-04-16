@@ -32,102 +32,54 @@ public class Main extends JavaPlugin {
     private Block brokenByPlayer;
     private Player playerWhoBrokeBlock;
 
-    // Getting strings from config.yml that are used in plugin
-    private String noPerms = getConfig().getString("message.noPerms");
-    private String configReload = getConfig().getString("message.configReload");
-    private String usingPerms = getConfig().getString("message.usingPerms");
-    private String launchFirework = getConfig().getString("message.launchFirework");
-    private String percentageError = getConfig().getString("message.percentageError");
-    private String numberError = getConfig().getString("message.numberError");
-    private String syntaxError = getConfig().getString("message.syntaxError");
-    private String badSyntax = getConfig().getString("message.badSyntax");
-    private String percentageValue = getConfig().getString("message.percentageValue");
-    private String enableFortune = getConfig().getString("message.enableFortune");
-    private String xpDropValue = getConfig().getString("message.xpDropValue");
-    private String chanceError = getConfig().getString("message.chanceError");
-    private String woodenChance = getConfig().getString("message.woodenChance");
-    private String stoneChance = getConfig().getString("message.stoneChance");
-    private String ironChance = getConfig().getString("message.ironChance");
-    private String goldenChance = getConfig().getString("message.goldenChance");
-    private String diamondChance = getConfig().getString("message.diamondChance");
-    private String noCommandsPerms = getConfig().getString("message.noCommandsPerms");
-    private String help = getConfig().getString("message.help");
-    private String helpReload = getConfig().getString("message.helpReload");
-    private String helpPerms = getConfig().getString("message.helpPerms");
-    private String helpFirework = getConfig().getString("message.helpFirework");
-    private String helpPercentage = getConfig().getString("message.helpPercentage");
-    private String helpFortune = getConfig().getString("message.helpFortune");
-    private String helpXpDrop = getConfig().getString("message.helpXpDrop");
-    private String helpWooden = getConfig().getString("message.helpWooden");
-    private String helpStone = getConfig().getString("message.helpStone");
-    private String helpIron = getConfig().getString("message.helpIron");
-    private String helpGolden = getConfig().getString("message.helpGolden");
-    private String helpDiamond = getConfig().getString("message.helpDiamond");
-    private String luckyDrop = getConfig().getString("message.luckyDrop");
-    private String onEnable = getConfig().getString("message.onEnable");
-    private String onDisable = getConfig().getString("message.onDisable");
+    // Declaring strings from config.yml
+    private String noPerms;
+    private String configReload;
+    private String usingPerms;
+    private String launchFirework;
+    private String percentageError;
+    private String numberError;
+    private String syntaxError;
+    private String badSyntax;
+    private String percentageValue;
+    private String enableFortune;
+    private String xpDropValue;
+    private String chanceError;
+    private String woodenChance;
+    private String stoneChance;
+    private String ironChance;
+    private String goldenChance;
+    private String diamondChance;
+    private String noCommandsPerms;
+    private String help;
+    private String helpReload;
+    private String helpPerms;
+    private String helpFirework;
+    private String helpPercentage;
+    private String helpFortune;
+    private String helpXpDrop;
+    private String helpWooden;
+    private String helpStone;
+    private String helpIron;
+    private String helpGolden;
+    private String helpDiamond;
+    private String luckyDrop;
+    private String onEnable;
+    private String onDisable;
 
-    // Getting variables from config.yml
-    private int configChanceWood = getConfig().getInt("chance.woodPickaxe");
-    private int configChanceStone = getConfig().getInt("chance.stonePickaxe");
-    private int configChanceIron = getConfig().getInt("chance.ironPickaxe");
-    private int configChanceGold = getConfig().getInt("chance.goldPickaxe");
-    private int configChanceDia = getConfig().getInt("chance.diaPickaxe");
-    private int percentage = getConfig().getInt("chance.percentage");
-    private boolean useFortune = getConfig().getBoolean("chance.useFortune");
-    private boolean usePerms = getConfig().getBoolean("permissions.usePerms");
-    private int xpDrop = getConfig().getInt("chance.xpDrop");
-    private boolean launchFireworkConfig = getConfig().getBoolean("misc.launchFirework");
+    // Declaring variables from config.yml
+    private int configChanceWood;
+    private int configChanceStone;
+    private int configChanceIron;
+    private int configChanceGold;
+    private int configChanceDia;
+    private int percentage;
+    private boolean useFortune;
+    private boolean usePerms;
+    private int xpDrop;
+    private boolean launchFireworkConfig;
 
-    // Adding default values in config when is not created
-    private void loadDefaultConfig(){
-        getConfig().addDefault("permissions.usePerms", false);
-        getConfig().addDefault("chance.useFortune", true);
-        getConfig().addDefault("chance.percentage", 1000);
-        getConfig().addDefault("chance.xpDrop", 100);
-        getConfig().addDefault("chance.woodPickaxe", 0);
-        getConfig().addDefault("chance.stonePickaxe", 0);
-        getConfig().addDefault("chance.ironPickaxe", 1);
-        getConfig().addDefault("chance.goldPickaxe", 2);
-        getConfig().addDefault("chance.diaPickaxe", 3);
-        getConfig().addDefault("misc.launchFirework", true);
-        getConfig().addDefault("message.onEnable", "is now ENABLED!");
-        getConfig().addDefault("message.onDisable", "is now DISABLED!");
-        getConfig().addDefault("message.noPerms", "You don't have permissions to do that!");
-        getConfig().addDefault("message.configReload", "Config reloaded");
-        getConfig().addDefault("message.usingPerms", "Using permissions set to");
-        getConfig().addDefault("message.launchFirework", "Launching fireworks set to");
-        getConfig().addDefault("message.percentageError", "You can't set percentage number lower than one of your chance number!");
-        getConfig().addDefault("message.numberError", "You can't use characters as arguments in this command!");
-        getConfig().addDefault("message.syntaxError", "You must use some arguments with this command!");
-        getConfig().addDefault("message.badSyntax", "You used bad argument! Please try it again.");
-        getConfig().addDefault("message.percentageValue", "Percentage value set to");
-        getConfig().addDefault("message.enableFortune", "Fortune chance set to");
-        getConfig().addDefault("message.xpDropValue", "XP drop value set to");
-        getConfig().addDefault("message.chanceError", "You can't set chance number higher than percentage number!");
-        getConfig().addDefault("message.woodenChance", "Chance of wooden pickaxe set to");
-        getConfig().addDefault("message.stoneChance", "Chance of stone pickaxe set to");
-        getConfig().addDefault("message.ironChance", "Chance of iron pickaxe set to");
-        getConfig().addDefault("message.goldenChance", "Chance of golden pickaxe set to");
-        getConfig().addDefault("message.diamondChance", "Chance of diamond pickaxe set to");
-        getConfig().addDefault("message.noCommandsPerms", "You don't have permissions to use any commands!");
-        getConfig().addDefault("message.help", "Help");
-        getConfig().addDefault("message.helpReload", "Reload config.yml");
-        getConfig().addDefault("message.helpPerms", "If you set this to true, player need permissions to have a chance to drop diamonds from coal ore");
-        getConfig().addDefault("message.helpFirework", "If you set this to true, when player drop diamond from coal, firework will be launched");
-        getConfig().addDefault("message.helpPercentage", "Percentage for chance to drop diamond (Default value is 1000)");
-        getConfig().addDefault("message.helpFortune", "If you set this to true, player have bigger chance to drop diamonds with Fortune enchantments calculated by vanilla mechanism");
-        getConfig().addDefault("message.helpXpDrop", "Ammount of XP points earned, when diamond is dropped (Default value is 100)");
-        getConfig().addDefault("message.helpWooden", "Chance to drop diamond from coal with wooden pickaxe in percentage (Use values between zero and percentage value!)");
-        getConfig().addDefault("message.helpStone", "Chance to drop diamond from coal with stone pickaxe in percentage (Use values between zero and percentage value!)");
-        getConfig().addDefault("message.helpIron", "Chance to drop diamond from coal with iron pickaxe in percentage (Use values between zero and percentage value!)");
-        getConfig().addDefault("message.helpGolden", "Chance to drop diamond from coal with golden pickaxe in percentage (Use values between zero and percentage value!)");
-        getConfig().addDefault("message.helpDiamond", "Chance to drop diamond from coal with diamond pickaxe in percentage (Use values between zero and percentage value!)");
-        getConfig().addDefault("message.luckyDrop", "Look on the ground! Take that lucky diamond mined from coal!");
-        getConfig().options().copyDefaults(true);
-        saveConfig();
-    }
-
+    // Method to load data from created config.yml
     private void loadConfig(){
         noPerms = getConfig().getString("message.noPerms");
         configReload = getConfig().getString("message.configReload");
@@ -174,6 +126,54 @@ public class Main extends JavaPlugin {
         launchFireworkConfig = getConfig().getBoolean("misc.launchFirework");
     }
 
+    // Adding default values in config when is not created
+    private void loadDefaultConfig(){
+        getConfig().addDefault("permissions.usePerms", false);
+        getConfig().addDefault("chance.useFortune", true);
+        getConfig().addDefault("chance.percentage", 100);
+        getConfig().addDefault("chance.xpDrop", 100);
+        getConfig().addDefault("chance.woodPickaxe", 0);
+        getConfig().addDefault("chance.stonePickaxe", 0);
+        getConfig().addDefault("chance.ironPickaxe", 1);
+        getConfig().addDefault("chance.goldPickaxe", 2);
+        getConfig().addDefault("chance.diaPickaxe", 3);
+        getConfig().addDefault("misc.launchFirework", true);
+        getConfig().addDefault("message.onEnable", "is now ENABLED!");
+        getConfig().addDefault("message.onDisable", "is now DISABLED!");
+        getConfig().addDefault("message.noPerms", "You don't have permissions to do that!");
+        getConfig().addDefault("message.configReload", "Config reloaded");
+        getConfig().addDefault("message.usingPerms", "Using permissions set to");
+        getConfig().addDefault("message.launchFirework", "Launching fireworks set to");
+        getConfig().addDefault("message.percentageError", "You can't set percentage number lower than one of your chance number!");
+        getConfig().addDefault("message.numberError", "You can't use characters as arguments in this command!");
+        getConfig().addDefault("message.syntaxError", "You must use some arguments with this command!");
+        getConfig().addDefault("message.badSyntax", "You used bad argument! Please try it again.");
+        getConfig().addDefault("message.percentageValue", "Percentage value set to");
+        getConfig().addDefault("message.enableFortune", "Fortune chance set to");
+        getConfig().addDefault("message.xpDropValue", "XP drop value set to");
+        getConfig().addDefault("message.chanceError", "You can't set chance number higher than percentage number!");
+        getConfig().addDefault("message.woodenChance", "Chance of wooden pickaxe set to");
+        getConfig().addDefault("message.stoneChance", "Chance of stone pickaxe set to");
+        getConfig().addDefault("message.ironChance", "Chance of iron pickaxe set to");
+        getConfig().addDefault("message.goldenChance", "Chance of golden pickaxe set to");
+        getConfig().addDefault("message.diamondChance", "Chance of diamond pickaxe set to");
+        getConfig().addDefault("message.noCommandsPerms", "You don't have permissions to use any commands!");
+        getConfig().addDefault("message.help", "Help");
+        getConfig().addDefault("message.helpReload", "Reload config.yml");
+        getConfig().addDefault("message.helpPerms", "If you set this to true, player need permissions to have a chance to drop diamonds from coal ore");
+        getConfig().addDefault("message.helpFirework", "If you set this to true, when player drop diamond from coal, firework will be launched");
+        getConfig().addDefault("message.helpPercentage", "Percentage for chance to drop diamond (Default value is 1000)");
+        getConfig().addDefault("message.helpFortune", "If you set this to true, player have bigger chance to drop diamonds with Fortune enchantments calculated by vanilla mechanism");
+        getConfig().addDefault("message.helpXpDrop", "Amount of XP points earned, when diamond is dropped (Default value is 100)");
+        getConfig().addDefault("message.helpWooden", "Chance to drop diamond from coal with wooden pickaxe in percentage (Use values between zero and percentage value!)");
+        getConfig().addDefault("message.helpStone", "Chance to drop diamond from coal with stone pickaxe in percentage (Use values between zero and percentage value!)");
+        getConfig().addDefault("message.helpIron", "Chance to drop diamond from coal with iron pickaxe in percentage (Use values between zero and percentage value!)");
+        getConfig().addDefault("message.helpGolden", "Chance to drop diamond from coal with golden pickaxe in percentage (Use values between zero and percentage value!)");
+        getConfig().addDefault("message.helpDiamond", "Chance to drop diamond from coal with diamond pickaxe in percentage (Use values between zero and percentage value!)");
+        getConfig().addDefault("message.luckyDrop", "Look on the ground! Take that lucky diamond mined from coal!");
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+    }
 
     // Enabling plugin
     @Override
@@ -200,16 +200,16 @@ public class Main extends JavaPlugin {
                     // Reload command
                     case "reload":
                         if (sender.hasPermission("CoalDiamonds.cmd.reload")){
+                            reloadConfig();
                             loadConfig();
                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + configReload);
-                            return true;
                         }
                         else {
                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
-                            return true;
                         }
+                        return true;
 
-                        // Useperms command
+                    // Useperms command
                     case "useperms":
                         if (sender.hasPermission("CoalDiamonds.cmd.usePerms")){
                             if (args.length > 1){
@@ -218,19 +218,17 @@ public class Main extends JavaPlugin {
                                 saveConfig();
                                 usePerms = getConfig().getBoolean("permissions.usePerms");
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + usingPerms + " " + usePermsValue);
-                                return true;
                             }
                             else {
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
-                                return true;
                             }
                         }
                         else {
                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
-                            return true;
                         }
+                        return true;
 
-                        // Launchfirework command
+                    // Launchfirework command
                     case "launchfirework":
                         if (sender.hasPermission("CoalDiamonds.cmd.launchFirework")){
                             if (args.length > 1){
@@ -239,19 +237,17 @@ public class Main extends JavaPlugin {
                                 saveConfig();
                                 launchFireworkConfig = getConfig().getBoolean("misc.launchFirework");
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + launchFirework + " " + launchFireworkValue);
-                                return true;
                             }
                             else {
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
-                                return true;
                             }
                         }
                         else {
                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
-                            return true;
                         }
+                        return true;
 
-                        // Percentage command
+                    // Percentage command
                     case "percentage":
                         if (sender.hasPermission("CoalDiamonds.cmd.percentage")){
                             try {
@@ -259,20 +255,18 @@ public class Main extends JavaPlugin {
                                     int percentageNumber = Integer.parseInt(args[1]);
                                     if ((configChanceWood > percentageNumber) || (configChanceStone > percentageNumber) || (configChanceIron > percentageNumber) || (configChanceGold > percentageNumber) || (configChanceDia > percentageNumber)) {
                                         sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + percentageError);
-                                        return true;
                                     }
                                     else {
                                         getConfig().set("chance.percentage", percentageNumber);
                                         saveConfig();
                                         percentage = getConfig().getInt("chance.percentage");
                                         sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + percentageValue + " " + percentageNumber);
-                                        return true;
                                     }
                                 }
                                 else {
                                     sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
-                                    return true;
                                 }
+                                return true;
                             }
                             catch (NumberFormatException e){
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + numberError);
@@ -284,7 +278,7 @@ public class Main extends JavaPlugin {
                             return true;
                         }
 
-                        // Fortune command
+                    // Fortune command
                     case "usefortune":
                         if (sender.hasPermission("CoalDiamonds.cmd.useFortune")){
                             if (args.length > 1){
@@ -293,19 +287,17 @@ public class Main extends JavaPlugin {
                                 saveConfig();
                                 useFortune = getConfig().getBoolean("chance.useFortune");
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + enableFortune + " " + usePermsValue);
-                                return true;
                             }
                             else {
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
-                                return true;
                             }
                         }
                         else {
                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
-                            return true;
                         }
+                        return true;
 
-                        // Xpdrop command
+                    // Xpdrop command
                     case "xpdrop":
                         if (sender.hasPermission("CoalDiamonds.cmd.xpDrop")){
                             try {
@@ -330,7 +322,7 @@ public class Main extends JavaPlugin {
                             return true;
                         }
 
-                        // Chance command
+                    // Chance command
                     case "chance":
                         if (sender.hasPermission("CoalDiamonds.cmd.chance")){
                             try {
@@ -340,63 +332,58 @@ public class Main extends JavaPlugin {
                                         case "wood":
                                             if (chanceNumber > percentage) {
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + chanceError);
-                                                return true;
                                             }
                                             else {
                                                 getConfig().set("chance.woodPickaxe", chanceNumber);
                                                 saveConfig();
                                                 configChanceWood = getConfig().getInt("chance.woodPickaxe");
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + woodenChance + " " + chanceNumber);
-                                                return true;
                                             }
+                                            return true;
                                         case "stone":
                                             if (chanceNumber > percentage) {
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + chanceError);
-                                                return true;
                                             }
                                             else {
                                                 getConfig().set("chance.stonePickaxe", chanceNumber);
                                                 saveConfig();
                                                 configChanceStone = getConfig().getInt("chance.stonePickaxe");
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + stoneChance + " " + chanceNumber);
-                                                return true;
                                             }
+                                            return true;
                                         case "iron":
                                             if (chanceNumber > percentage) {
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + chanceError);
-                                                return true;
                                             }
                                             else {
                                                 getConfig().set("chance.ironPickaxe", chanceNumber);
                                                 saveConfig();
                                                 configChanceIron = getConfig().getInt("chance.ironPickaxe");
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + ironChance + " " + chanceNumber);
-                                                return true;
                                             }
+                                            return true;
                                         case "gold":
                                             if (chanceNumber > percentage) {
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + chanceError);
-                                                return true;
                                             }
                                             else {
                                                 getConfig().set("chance.goldPickaxe", chanceNumber);
                                                 saveConfig();
                                                 configChanceGold = getConfig().getInt("chance.goldPickaxe");
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + goldenChance + " " + chanceNumber);
-                                                return true;
                                             }
+                                            return true;
                                         case "dia":
                                             if (chanceNumber > percentage) {
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + chanceError);
-                                                return true;
                                             }
                                             else {
                                                 getConfig().set("chance.diaPickaxe", chanceNumber);
                                                 saveConfig();
                                                 configChanceDia = getConfig().getInt("chance.diaPickaxe");
                                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + diamondChance + " " + chanceNumber);
-                                                return true;
                                             }
+                                            return true;
                                         default:
                                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + badSyntax);
                                             return true;
@@ -417,7 +404,7 @@ public class Main extends JavaPlugin {
                             return true;
                         }
 
-                        // Help if argument is bad
+                    // Help if argument is bad
                     default:
                         help(sender);
                         return true;
@@ -498,7 +485,11 @@ public class Main extends JavaPlugin {
         public void onBlockBreak(BlockBreakEvent event) {
             brokenByPlayer = event.getBlock();
             playerWhoBrokeBlock = event.getPlayer();
+
+            // call coalBreak only when the block is coal ore
             if (brokenByPlayer.getType()==Material.COAL_ORE){
+
+                // check for permission usage as declared in config.yml
                 if (usePerms){
                     if (playerWhoBrokeBlock.hasPermission("CoalDiamonds.canMine")){
                         coalBreak(event);
@@ -513,8 +504,14 @@ public class Main extends JavaPlugin {
         // What to do, when coal ore is mined
         void coalBreak(BlockBreakEvent event){
             playerWhoBrokeBlock = event.getPlayer();
+
+            // Setting bonus chance gained by Fortune to zero
             int bonusChance = 0;
-            int randomNumber = new Random().nextInt(percentage);
+
+            // Random number creation (-1 is to calculate properly, random number create number from 0)
+            int randomNumber = new Random().nextInt(percentage - 1);
+
+            // Check for Fortune and if yes add level number of fortune to bonusChance
             if (useFortune) {
                 if (playerWhoBrokeBlock.getInventory().getItemInMainHand().containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)){
                     bonusChance = playerWhoBrokeBlock.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
@@ -523,9 +520,11 @@ public class Main extends JavaPlugin {
             String gm = event.getPlayer().getGameMode().name();
             Material item = event.getPlayer().getInventory().getItemInMainHand().getType();
             boolean silkTouch = event.getPlayer().getInventory().getItemInMainHand().containsEnchantment(Enchantment.SILK_TOUCH);
+
+            // Check if user is not in creative, does not have silk touch on pickaxe and the event is not cancelled
             if (!gm.equals("CREATIVE") && !silkTouch && !event.isCancelled()){
 
-                // Debug
+                // Debug - will be removed in full release
                 playerWhoBrokeBlock.sendMessage(percentage + " " + randomNumber + " " + configChanceDia + " " + bonusChance);
 
                 switch(item){
@@ -542,13 +541,19 @@ public class Main extends JavaPlugin {
         // Drops and effects when coalBreak method is called
         void drop(){
             int xpDropExcess = xpDrop % 10;
+
+            // Drop diamond
             brokenByPlayer.getWorld().dropItemNaturally(brokenByPlayer.getLocation(), new ItemStack(Material.DIAMOND, 1));
+
+            // Drop experience
             for (int xp = 10; xp <= xpDrop; xp = xp+10){
                 brokenByPlayer.getWorld().spawn(brokenByPlayer.getLocation(), ExperienceOrb.class).setExperience(10);
             }
             if (xpDropExcess != 0){
                 brokenByPlayer.getWorld().spawn(brokenByPlayer.getLocation(), ExperienceOrb.class).setExperience(xpDropExcess);
             }
+
+            // Launch firework on drop if true in config.yml
             if (launchFireworkConfig){
                 Random r = new Random();
                 int r1i = r.nextInt(17) + 1;

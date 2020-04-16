@@ -32,8 +32,8 @@ Version 1.2 for Spigot 1.15.2 now WIP!
 * /cdia reload - reload config.yml
 * /cdia useperms &lt;true/false&gt; - turning usage of permissions on and off
 * /cdia launchfirework &lt;true/false&gt; - turning launching fireworks on and off
+* /cdia usefortune &lt;true/false&gt; - turning adding Fortune level number to base chance on and off
 * /cdia percentage &lt;value&gt; - set percentage value (default: 100, how my chance system work you can find under Installation section)
-* /cdia usefortune &lt;value&gt; - set ammount of points added to chance when player have Fortune enchantment on pickaxe (default: 10)
 * /cdia xpdrop &lt;value&gt; - set ammount of XP points earned, when diamond is dropped (default: 100)
 * /cdia chance wood &lt;value&gt; - set chance to wood pickaxe (default: 0)
 * /cdia chance stone &lt;value&gt; - set chance to stone pickaxe (default: 0)
@@ -62,7 +62,7 @@ If you have something good on your mind that this plugin don't have, create issu
 
 ## Known Issues
 
-* /cdia reload command not working
+* Nothing yet
 
 ## Installation
 
