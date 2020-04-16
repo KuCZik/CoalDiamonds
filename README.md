@@ -1,6 +1,6 @@
 # CoalDiamonds
 
-Mine coal with chance to drop diamonds!!!
+Mine coal with chance to drop diamonds!
 
 ## Introduction
 
@@ -12,7 +12,7 @@ Idea for this plugin was invited by Mertum. Thanks bro!
 
 ## Status
 
-Version 1.2 for Spigot 1.15.2 now WIP!
+Version 1.2 for Spigot 1.15.2 is now released!
 
 ## Features
 
@@ -58,11 +58,11 @@ Version 1.2 for Spigot 1.15.2 now WIP!
 
 * Update checking
 
-If you have something good on your mind that this plugin don't have, create issue with your feature please.
+If you have something good on your mind that this plugin don't have, create issue with your feature.
 
 ## Known Issues
 
-* Nothing yet
+* When firework is spawned on diamond drop, it can hurt player (if you don't want this happen, just turn firework effect off for now)
 
 ## Installation
 
@@ -77,7 +77,7 @@ If you have percentage value 100 and Diamond Pickaxe chance on 3, you will have 
 You can download this plugin on:
 
 * [GitHub](https://github.com/KuCZik/CoalDiamonds/releases "GitHub")
-* [SpigotMC]( "SpigotMC")
+* [SpigotMC](https://www.spigotmc.org/resources/coaldiamonds.77504/ "SpigotMC")
 * [BukkitDev](https://dev.bukkit.org/projects/coaldiamonds "BukkitDev")
 
 ## Feedback
