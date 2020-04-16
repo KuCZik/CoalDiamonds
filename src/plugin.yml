@@ -1,0 +1,56 @@
+name: CoalDiamonds
+author: KuCZik
+version: 1.2pre1
+api-version: 1.15
+main: cz.KuCZik.CoalDiamonds.Main
+website: http://dev.bukkit.org/server-mods/coaldiamonds/
+prefix: CoalDiamonds
+commands:
+  cdia:
+    description: Basic command for CoalDiamonds. Write this command for help.
+permissions:
+  CoalDiamonds.*:
+    description: Gives access to all CoalDiamonds features
+    children:
+      CoalDiamonds.canMine: true
+      CoalDiamonds.cmd.reload: true
+      CoalDiamonds.cmd.chance: true
+      CoalDiamonds.cmd.usePerms: true
+      CoalDiamonds.cmd.percentage: true
+      CoalDiamonds.cmd.useFortune: true
+      CoalDiamonds.cmd.xpDrop: true
+      CoalDiamonds.cmd.launchFirework: true
+  CoalDiamonds.cmd.*:
+    description: Gives access to all CoalDiamonds commands
+    children:
+      CoalDiamonds.cmd.reload: true
+      CoalDiamonds.cmd.chance: true
+      CoalDiamonds.cmd.usePerms: true
+      CoalDiamonds.cmd.percentage: true
+      CoalDiamonds.cmd.fortune: true
+      CoalDiamonds.cmd.xpDrop: true
+      CoalDiamonds.cmd.launchFirework: true
+  CoalDiamonds.canMine:
+    description: Allows you to mine coal with chance to drop diamond
+    default: false
+  CoalDiamonds.cmd.reload:
+    description: Allows you to execute /cdia reload
+    default: op
+  CoalDiamonds.cmd.percentage:
+    description: Allows you to execute /cdia percentage <percentage value>
+    default: op
+  CoalDiamonds.cmd.chance:
+    description: Allows you to execute /cdia chance <chance value>
+    default: op
+  CoalDiamonds.cmd.usePerms:
+    description: Allows you to execute /cdia useperms <true/false>
+    default: op
+  CoalDiamonds.cmd.fortune:
+    description: Allows you to execute /cdia fortune <true/false>
+    default: op
+  CoalDiamonds.cmd.xpDrop:
+    description: Allows you to execute /cdia xpdrop <xp drop value>
+    default: op
+  CoalDiamonds.cmd.launchFirework:
+    description: Allows you to execute /cdia launchFirework <true/false>
+    default: op
