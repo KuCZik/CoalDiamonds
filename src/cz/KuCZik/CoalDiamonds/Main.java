@@ -525,7 +525,7 @@ public class Main extends JavaPlugin {
             if (!gm.equals("CREATIVE") && !silkTouch && !event.isCancelled()){
 
                 // Debug - will be removed in full release
-                playerWhoBrokeBlock.sendMessage(percentage + " " + randomNumber + " " + configChanceDia + " " + bonusChance);
+                // playerWhoBrokeBlock.sendMessage(percentage + " " + randomNumber + " " + configChanceDia + " " + bonusChance);
 
                 switch(item){
                     case WOODEN_PICKAXE: if (randomNumber < (configChanceWood + bonusChance)){drop();} break;

@@ -12,7 +12,7 @@ Idea for this plugin was invited by Mertum. Thanks bro!
 
 ## Status
 
-Version 1.2 for Spigot 1.15.2 is now released!
+Version 1.2.1 for Spigot 1.15.2 is now released!
 
 ## Features
 
