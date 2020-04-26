@@ -1,6 +1,6 @@
 name: CoalDiamonds
 author: KuCZik
-version: 1.2.1
+version: 1.3pre1
 api-version: 1.15
 main: cz.KuCZik.CoalDiamonds.Main
 website: http://dev.bukkit.org/server-mods/coaldiamonds/
@@ -14,6 +14,7 @@ permissions:
     children:
       CoalDiamonds.canMine: true
       CoalDiamonds.cmd.reload: true
+      CoalDiamonds.cmd.updateCheck: true
       CoalDiamonds.cmd.chance: true
       CoalDiamonds.cmd.usePerms: true
       CoalDiamonds.cmd.percentage: true
@@ -24,6 +25,7 @@ permissions:
     description: Gives access to all CoalDiamonds commands
     children:
       CoalDiamonds.cmd.reload: true
+      CoalDiamonds.cmd.updateCheck: true
       CoalDiamonds.cmd.chance: true
       CoalDiamonds.cmd.usePerms: true
       CoalDiamonds.cmd.percentage: true
@@ -38,6 +40,9 @@ permissions:
     default: op
   CoalDiamonds.cmd.percentage:
     description: Allows you to execute /cdia percentage <percentage value>
+    default: op
+  CoalDiamonds.cmd.updateCheck:
+    description: Allows you to execute /cdia updatecheck <true/false>
     default: op
   CoalDiamonds.cmd.chance:
     description: Allows you to execute /cdia chance <chance value>

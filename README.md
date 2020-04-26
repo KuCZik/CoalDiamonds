@@ -25,11 +25,14 @@ Version 1.2.1 for Spigot 1.15.2 is now released!
 * Giving more XP from coal ore, when diamond was dropped (This value can be changed)
 * Launching firework when you have luck and you drop diamond from coal ore (This can be turned off)
 * You have better chance to drop diamond, when you have Fortune on your pickaxe (Adding Fortune enchant level number to base pickaxe chance value)
+* Automatic update checking (Can be disabled in config.yml file)
 
 ## Commands
 
 * /cdia - show you help
 * /cdia reload - reload config.yml
+* /cdia updatecheck - show you new version released if there is one
+* /cdia updatecheck &lt;true/false&gt; - turning update checking on and off
 * /cdia useperms &lt;true/false&gt; - turning usage of permissions on and off
 * /cdia launchfirework &lt;true/false&gt; - turning launching fireworks on and off
 * /cdia usefortune &lt;true/false&gt; - turning adding Fortune level number to base chance on and off
@@ -47,6 +50,7 @@ Version 1.2.1 for Spigot 1.15.2 is now released!
 * CoalDiamonds.cmd.* - Gives player access to every command
 * CoalDiamonds.canMine - Gives player chance to mine diamonds from coal ore
 * CoalDiamonds.cmd.reload - Gives player access to /cdia reload command
+* CoalDiamonds.cmd.updateCheck - Gives player access to /cdia updatecheck command
 * CoalDiamonds.cmd.percentage - Gives player access to /cdia percentage command
 * CoalDiamonds.cmd.chance - Gives player access to /cdia chance command
 * CoalDiamonds.cmd.usePerms - Gives player access to /cdia useperms command
@@ -56,7 +60,7 @@ Version 1.2.1 for Spigot 1.15.2 is now released!
 
 ## Planning
 
-* Update checking
+* Some effect when you drop diamond from coal ore (Firework replacement - something that does not hurt players)
 
 If you have something good on your mind that this plugin don't have, create issue with your feature.
 

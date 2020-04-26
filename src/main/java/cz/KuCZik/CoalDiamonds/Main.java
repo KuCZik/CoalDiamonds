@@ -1,11 +1,15 @@
 package cz.KuCZik.CoalDiamonds;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Random;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.bukkit.*;
 import org.bukkit.FireworkEffect.Type;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,9 +21,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  * @author KuCZik
@@ -29,6 +35,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     // Declaration of variables
+    public final String usingPluginVersion = getDescription().getVersion();
+    public String latestPluginVersion = getDescription().getVersion();
+    public boolean firstRun;
+    public BukkitTask checkForUpdatesTask;
     private Block brokenByPlayer;
     private Player playerWhoBrokeBlock;
 
@@ -37,6 +47,10 @@ public class Main extends JavaPlugin {
     private String configReload;
     private String usingPerms;
     private String launchFirework;
+    private String updateCheckingMsg;
+    private String latestVersionMsg;
+    private String updateCheckingDisabledMsg;
+    private String newVersionAvailableMsg;
     private String percentageError;
     private String numberError;
     private String syntaxError;
@@ -53,6 +67,7 @@ public class Main extends JavaPlugin {
     private String noCommandsPerms;
     private String help;
     private String helpReload;
+    private String helpUpdateCheck;
     private String helpPerms;
     private String helpFirework;
     private String helpPercentage;
@@ -78,6 +93,7 @@ public class Main extends JavaPlugin {
     private boolean usePerms;
     private int xpDrop;
     private boolean launchFireworkConfig;
+    private boolean updateChecking;
 
     // Method to load data from created config.yml
     private void loadConfig(){
@@ -85,6 +101,10 @@ public class Main extends JavaPlugin {
         configReload = getConfig().getString("message.configReload");
         usingPerms = getConfig().getString("message.usingPerms");
         launchFirework = getConfig().getString("message.launchFirework");
+        updateCheckingMsg = getConfig().getString("message.updateChecking");
+        latestVersionMsg = getConfig().getString("message.latestVersion");
+        updateCheckingDisabledMsg = getConfig().getString("message.updateCheckingDisabled");
+        newVersionAvailableMsg = getConfig().getString("message.newVersionAvailable");
         percentageError = getConfig().getString("message.percentageError");
         numberError = getConfig().getString("message.numberError");
         syntaxError = getConfig().getString("message.syntaxError");
@@ -101,6 +121,7 @@ public class Main extends JavaPlugin {
         noCommandsPerms = getConfig().getString("message.noCommandsPerms");
         help = getConfig().getString("message.help");
         helpReload = getConfig().getString("message.helpReload");
+        helpUpdateCheck = getConfig().getString("message.helpUpdateCheck");
         helpPerms = getConfig().getString("message.helpPerms");
         helpFirework = getConfig().getString("message.helpFirework");
         helpPercentage = getConfig().getString("message.helpPercentage");
@@ -124,6 +145,7 @@ public class Main extends JavaPlugin {
         usePerms = getConfig().getBoolean("permissions.usePerms");
         xpDrop = getConfig().getInt("chance.xpDrop");
         launchFireworkConfig = getConfig().getBoolean("misc.launchFirework");
+        updateChecking = getConfig().getBoolean("misc.updateChecking");
     }
 
     // Adding default values in config when is not created
@@ -138,12 +160,17 @@ public class Main extends JavaPlugin {
         getConfig().addDefault("chance.goldPickaxe", 2);
         getConfig().addDefault("chance.diaPickaxe", 3);
         getConfig().addDefault("misc.launchFirework", true);
+        getConfig().addDefault("misc.updateChecking", true);
         getConfig().addDefault("message.onEnable", "is now ENABLED!");
         getConfig().addDefault("message.onDisable", "is now DISABLED!");
         getConfig().addDefault("message.noPerms", "You don't have permissions to do that!");
         getConfig().addDefault("message.configReload", "Config reloaded");
         getConfig().addDefault("message.usingPerms", "Using permissions set to");
         getConfig().addDefault("message.launchFirework", "Launching fireworks set to");
+        getConfig().addDefault("message.updateChecking", "Update checking set to");
+        getConfig().addDefault("message.latestVersion", "You have the latest release.");
+        getConfig().addDefault("message.updateCheckingDisabled", "You have disabled update checking feature.");
+        getConfig().addDefault("message.newVersionAvailable", "version has been released.");
         getConfig().addDefault("message.percentageError", "You can't set percentage number lower than one of your chance number!");
         getConfig().addDefault("message.numberError", "You can't use characters as arguments in this command!");
         getConfig().addDefault("message.syntaxError", "You must use some arguments with this command!");
@@ -160,6 +187,7 @@ public class Main extends JavaPlugin {
         getConfig().addDefault("message.noCommandsPerms", "You don't have permissions to use any commands!");
         getConfig().addDefault("message.help", "Help");
         getConfig().addDefault("message.helpReload", "Reload config.yml");
+        getConfig().addDefault("message.helpUpdateCheck", "Turn update check on or off");
         getConfig().addDefault("message.helpPerms", "If you set this to true, player need permissions to have a chance to drop diamonds from coal ore");
         getConfig().addDefault("message.helpFirework", "If you set this to true, when player drop diamond from coal, firework will be launched");
         getConfig().addDefault("message.helpPercentage", "Percentage for chance to drop diamond (Default value is 1000)");
@@ -178,15 +206,31 @@ public class Main extends JavaPlugin {
     // Enabling plugin
     @Override
     public void onEnable(){
+
+        // Loading config and if it is not present, create one
         loadDefaultConfig();
         loadConfig();
+
+        // Registering events
+        getServer().getPluginManager().registerEvents(new onPlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new onBlockBreakListener(), this);
+
+        // Run async task timer for update check
+        if(updateChecking) {
+            firstRun = true;
+            checkForUpdates(usingPluginVersion);
+        }
+
         getLogger().info("CoalDiamonds " + getDescription().getVersion() + " " + onEnable);
     }
 
     // Disabling plugin
     @Override
     public void onDisable() {
+
+        // Disable all tasks before quit
+        Bukkit.getServer().getScheduler().cancelTasks(this);
+
         getLogger().info("CoalDiamonds " + getDescription().getVersion() + " " + onDisable);
     }
 
@@ -200,9 +244,14 @@ public class Main extends JavaPlugin {
                     // Reload command
                     case "reload":
                         if (sender.hasPermission("CoalDiamonds.cmd.reload")){
-                            reloadConfig();
-                            loadConfig();
-                            sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + configReload);
+                            if (args.length < 2) {
+                                reloadConfig();
+                                loadConfig();
+                                sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + configReload);
+                            }
+                            else {
+                                sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + badSyntax);
+                            }
                         }
                         else {
                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
@@ -213,11 +262,16 @@ public class Main extends JavaPlugin {
                     case "useperms":
                         if (sender.hasPermission("CoalDiamonds.cmd.usePerms")){
                             if (args.length > 1){
-                                Boolean usePermsValue = Boolean.valueOf(args[1]);
-                                getConfig().set("permissions.usePerms", usePermsValue);
-                                saveConfig();
-                                usePerms = getConfig().getBoolean("permissions.usePerms");
-                                sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + usingPerms + " " + usePermsValue);
+                                if (args[1].equals("true") || args[1].equals("false")) {
+                                    Boolean usePermsValue = Boolean.valueOf(args[1]);
+                                    getConfig().set("permissions.usePerms", usePermsValue);
+                                    saveConfig();
+                                    usePerms = getConfig().getBoolean("permissions.usePerms");
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + usingPerms + " " + usePermsValue);
+                                }
+                                else {
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + badSyntax);
+                                }
                             }
                             else {
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
@@ -232,11 +286,80 @@ public class Main extends JavaPlugin {
                     case "launchfirework":
                         if (sender.hasPermission("CoalDiamonds.cmd.launchFirework")){
                             if (args.length > 1){
-                                Boolean launchFireworkValue = Boolean.valueOf(args[1]);
-                                getConfig().set("misc.launchFirework", launchFireworkValue);
-                                saveConfig();
-                                launchFireworkConfig = getConfig().getBoolean("misc.launchFirework");
-                                sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + launchFirework + " " + launchFireworkValue);
+                                if (args[1].equals("true") || args[1].equals("false")) {
+                                    Boolean launchFireworkValue = Boolean.valueOf(args[1]);
+                                    getConfig().set("misc.launchFirework", launchFireworkValue);
+                                    saveConfig();
+                                    launchFireworkConfig = getConfig().getBoolean("misc.launchFirework");
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + launchFirework + " " + launchFireworkValue);
+                                }
+                                else {
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + badSyntax);
+                                }
+                            }
+                            else {
+                                sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
+                            }
+                        }
+                        else {
+                            sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
+                        }
+                        return true;
+
+                    // Updatecheck command
+                    case "updatecheck":
+                        if (sender.hasPermission("CoalDiamonds.cmd.updateCheck")){
+                            if (args.length > 1){
+                                if (args[1].equals("true") || args[1].equals("false")) {
+                                    Boolean updateCheckingValue = Boolean.valueOf(args[1]);
+                                    getConfig().set("misc.updateChecking", updateCheckingValue);
+                                    saveConfig();
+                                    updateChecking = getConfig().getBoolean("misc.updateChecking");
+                                    if (args[1].equals("false")) {
+                                        checkForUpdatesTask.cancel();
+                                    }
+                                    if (args[1].equals("true")) {
+                                        checkForUpdatesTask.cancel();
+                                        firstRun = true;
+                                        checkForUpdates(usingPluginVersion);
+                                    }
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + updateCheckingMsg + " " + updateCheckingValue);
+                                }
+                                else {
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + badSyntax);
+                                }
+                            }
+                            else {
+                                if (updateChecking && !usingPluginVersion.equalsIgnoreCase(latestPluginVersion)) {
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + latestPluginVersion + " " + ChatColor.GREEN + newVersionAvailableMsg);
+                                }
+                                else if (updateChecking && usingPluginVersion.equalsIgnoreCase(latestPluginVersion)) {
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + latestVersionMsg);
+                                }
+                                else if (!updateChecking) {
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + updateCheckingDisabledMsg);
+                                }
+                            }
+                        }
+                        else {
+                            sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
+                        }
+                        return true;
+
+                    // Fortune command
+                    case "usefortune":
+                        if (sender.hasPermission("CoalDiamonds.cmd.useFortune")){
+                            if (args.length > 1){
+                                if (args[1].equals("true") || args[1].equals("false")) {
+                                    Boolean usePermsValue = Boolean.valueOf(args[1]);
+                                    getConfig().set("chance.useFortune", usePermsValue);
+                                    saveConfig();
+                                    useFortune = getConfig().getBoolean("chance.useFortune");
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + enableFortune + " " + usePermsValue);
+                                }
+                                else {
+                                    sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + badSyntax);
+                                }
                             }
                             else {
                                 sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
@@ -277,25 +400,6 @@ public class Main extends JavaPlugin {
                             sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
                             return true;
                         }
-
-                    // Fortune command
-                    case "usefortune":
-                        if (sender.hasPermission("CoalDiamonds.cmd.useFortune")){
-                            if (args.length > 1){
-                                Boolean usePermsValue = Boolean.valueOf(args[1]);
-                                getConfig().set("chance.useFortune", usePermsValue);
-                                saveConfig();
-                                useFortune = getConfig().getBoolean("chance.useFortune");
-                                sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.GREEN + enableFortune + " " + usePermsValue);
-                            }
-                            else {
-                                sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + syntaxError);
-                            }
-                        }
-                        else {
-                            sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + noPerms);
-                        }
-                        return true;
 
                     // Xpdrop command
                     case "xpdrop":
@@ -422,24 +526,35 @@ public class Main extends JavaPlugin {
 
     // Help method
     private void help(CommandSender sender){
+        boolean playerHaveNoPerm = true;
         sender.sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.WHITE + help + ":");
         if (sender.hasPermission("CoalDiamonds.cmd.reload")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "reload" + ChatColor.WHITE + " - " + helpReload);
+            playerHaveNoPerm = false;
+        }
+        if (sender.hasPermission("CoalDiamonds.cmd.updateCheck")){
+            sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "updatecheck" + ChatColor.GOLD + " <true/false>" + ChatColor.WHITE + " - " + helpUpdateCheck);
+            playerHaveNoPerm = false;
         }
         if (sender.hasPermission("CoalDiamonds.cmd.usePerms")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "useperms" + ChatColor.GOLD + " <true/false>" + ChatColor.WHITE + " - " + helpPerms);
+            playerHaveNoPerm = false;
         }
         if (sender.hasPermission("CoalDiamonds.cmd.launchFirework")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "launchfirework" + ChatColor.GOLD + " <true/false>" + ChatColor.WHITE + " - " + helpFirework);
+            playerHaveNoPerm = false;
         }
         if (sender.hasPermission("CoalDiamonds.cmd.percentage")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "percentage" + ChatColor.GOLD + " <value>" + ChatColor.WHITE + " - " + helpPercentage);
+            playerHaveNoPerm = false;
         }
         if (sender.hasPermission("CoalDiamonds.cmd.useFortune")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "usefortune" + ChatColor.GOLD + " <true/false>" + ChatColor.WHITE + " - " + helpFortune);
+            playerHaveNoPerm = false;
         }
         if (sender.hasPermission("CoalDiamonds.cmd.xpDrop")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "xpdrop" + ChatColor.GOLD + " <value>" + ChatColor.WHITE + " - " + helpXpDrop);
+            playerHaveNoPerm = false;
         }
         if (sender.hasPermission("CoalDiamonds.cmd.chance")){
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "chance" + ChatColor.YELLOW + " wood" + ChatColor.GOLD + " <value>" + ChatColor.WHITE + " - " + helpWooden);
@@ -447,12 +562,14 @@ public class Main extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "chance" + ChatColor.YELLOW + " iron" + ChatColor.GOLD + " <value>" + ChatColor.WHITE + " - " + helpIron);
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "chance" + ChatColor.YELLOW + " gold" + ChatColor.GOLD + " <value>" + ChatColor.WHITE + " - " + helpGolden);
             sender.sendMessage(ChatColor.RED + "/cdia " + ChatColor.GREEN + "chance" + ChatColor.YELLOW + " dia" + ChatColor.GOLD + " <value>" + ChatColor.WHITE + " - " + helpDiamond);
+            playerHaveNoPerm = false;
         }
-        else {
+        if (playerHaveNoPerm) {
             sender.sendMessage(ChatColor.RED + noCommandsPerms);
         }
     }
 
+    // Block break event listener class
     public class onBlockBreakListener implements Listener {
 
         // Color declaration
@@ -482,21 +599,21 @@ public class Main extends JavaPlugin {
 
         // BlockBreak event
         @EventHandler
-        public void onBlockBreak(BlockBreakEvent event) {
-            brokenByPlayer = event.getBlock();
-            playerWhoBrokeBlock = event.getPlayer();
+        public void onBlockBreak(BlockBreakEvent blockBreakEvent) {
+            brokenByPlayer = blockBreakEvent.getBlock();
+            playerWhoBrokeBlock = blockBreakEvent.getPlayer();
 
             // call coalBreak only when the block is coal ore
-            if (brokenByPlayer.getType()==Material.COAL_ORE){
+            if (brokenByPlayer.getType()== Material.COAL_ORE){
 
                 // check for permission usage as declared in config.yml
                 if (usePerms){
                     if (playerWhoBrokeBlock.hasPermission("CoalDiamonds.canMine")){
-                        coalBreak(event);
+                        coalBreak(blockBreakEvent);
                     }
                 }
                 else {
-                    coalBreak(event);
+                    coalBreak(blockBreakEvent);
                 }
             }
         }
@@ -523,9 +640,6 @@ public class Main extends JavaPlugin {
 
             // Check if user is not in creative, does not have silk touch on pickaxe and the event is not cancelled
             if (!gm.equals("CREATIVE") && !silkTouch && !event.isCancelled()){
-
-                // Debug - will be removed in full release
-                // playerWhoBrokeBlock.sendMessage(percentage + " " + randomNumber + " " + configChanceDia + " " + bonusChance);
 
                 switch(item){
                     case WOODEN_PICKAXE: if (randomNumber < (configChanceWood + bonusChance)){drop();} break;
@@ -569,5 +683,61 @@ public class Main extends JavaPlugin {
             }
             playerWhoBrokeBlock.sendMessage(ChatColor.AQUA + luckyDrop);
         }
+    }
+
+    // User joining server event listener class
+    public class onPlayerJoinListener implements Listener {
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent playerJoinEvent) {
+
+            // Update check
+            if (updateChecking && playerJoinEvent.getPlayer().hasPermission("CoalDiamonds.cmd.updateCheck") && !usingPluginVersion.equalsIgnoreCase(latestPluginVersion)) {
+                playerJoinEvent.getPlayer().sendMessage(ChatColor.AQUA + "[CoalDiamonds] " + ChatColor.RED + latestPluginVersion + " " + ChatColor.GREEN + newVersionAvailableMsg);
+            }
+        }
+    }
+
+    // Async update checker, need player name and current plugin version as arguments (in case of console, use null)
+    public void checkForUpdates(String usingPluginVersion) {
+
+        // Run async task
+        checkForUpdatesTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+
+            // Exception in case something goes wrong
+            try {
+                String latestPluginReleaseJSON;
+
+                // URL declaration from where to get Github Rest API JSON file
+                URL latestPluginReleaseURL = new URL("https://api.github.com/repos/KuCZik/CoalDiamonds/releases/latest");
+
+                // Get JSON in BufferedReader and transfer it into string
+                latestPluginReleaseJSON = new BufferedReader(new InputStreamReader(latestPluginReleaseURL.openStream())).readLine();
+
+                // Check if the JSON is present
+                if (latestPluginReleaseJSON != null) {
+
+                    // Make a JSON Object from String (Using Gson)
+                    JsonObject latestPluginReleaseJsonObject = new Gson().fromJson(latestPluginReleaseJSON, JsonObject.class);
+
+                    // Get tag_name data (version of plugin) to compare with currently used version
+                    latestPluginVersion = latestPluginReleaseJsonObject.get("tag_name").getAsString();
+
+                    // Send message to console if there is new release
+                    if (firstRun && !usingPluginVersion.equalsIgnoreCase(latestPluginVersion)) {
+                        getLogger().warning(latestPluginVersion + " " + newVersionAvailableMsg);
+                    }
+
+                    // To be sure that the async task timer don't send message to console every run
+                    firstRun = false;
+                }
+            }
+
+            // If the attempt failed, post exception error in the console
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            // Run this task once immediately at start and then every 15 minutes
+        }, 0L, 18000L);
     }
 }
